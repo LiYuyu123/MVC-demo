@@ -444,49 +444,108 @@ id) /*: string*/
 },{}],"30Yv7":[function(require,module,exports) {
 require('./global.css');
 require('./reset.css');
-require('./app1.js');
-require('./app2.js');
+var _app1Js = require('./app1.js');
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+var _app1JsDefault = _parcelHelpers.interopDefault(_app1Js);
+var _app2Js = require('./app2.js');
+var _app2JsDefault = _parcelHelpers.interopDefault(_app2Js);
 require('./app3.js');
 require('./app4.js');
+_app1JsDefault.default.init('#app1');
+_app2JsDefault.default.init('#app2');
 
-},{"./global.css":"2yhtl","./reset.css":"5dMMQ","./app1.js":"6OJP0","./app2.js":"1bsR9","./app3.js":"4knbM","./app4.js":"3XxMI"}],"2yhtl":[function() {},{}],"5dMMQ":[function() {},{}],"6OJP0":[function(require,module,exports) {
+},{"./global.css":"2yhtl","./reset.css":"5dMMQ","./app1.js":"6OJP0","./app2.js":"1bsR9","./app3.js":"4knbM","./app4.js":"3XxMI","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz"}],"2yhtl":[function() {},{}],"5dMMQ":[function() {},{}],"6OJP0":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
 require('./app1.css');
 var _jquery = require('jquery');
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 var _jqueryDefault = _parcelHelpers.interopDefault(_jquery);
-const $button1 = _jqueryDefault.default('#add1');
-const $button2 = _jqueryDefault.default('#minus1');
-const $button3 = _jqueryDefault.default('#mul2');
-const $button4 = _jqueryDefault.default('#divide2');
-const $number = _jqueryDefault.default('#number');
-const n = localStorage.getItem('n');
-$number.text(n || 100);
-$button1.on('click', () => {
-  let n = parseInt($number.text());
-  n += 1;
-  localStorage.setItem('n', n);
-  $number.text(n);
+var _baseModel = require("./base/Model");
+var _baseModelDefault = _parcelHelpers.interopDefault(_baseModel);
+const eventBus = _jqueryDefault.default(window);
+// eventBus对象间的通信
+// 数据相关的放到m
+const m = new _baseModelDefault.default({
+  data: {
+    n: parseInt(localStorage.getItem('n')) || 100
+  },
+  update(data) {
+    Object.assign(m.data, data);
+    eventBus.trigger('m:update');
+    localStorage.setItem('n', m.data.n);
+  }
 });
-$button2.on('click', () => {
-  let n = parseInt($number.text());
-  n -= 1;
-  localStorage.setItem('n', n);
-  $number.text(n);
-});
-$button3.on('click', () => {
-  let n = parseInt($number.text());
-  n *= 2;
-  localStorage.setItem('n', n);
-  $number.text(n);
-});
-$button4.on('click', () => {
-  let n = parseInt($number.text());
-  n /= 2;
-  localStorage.setItem('n', n);
-  $number.text(n);
-});
+// 初始化数据
+// 视图相关的反到v
+// 其他c
+const view = {
+  el: null,
+  html: `
+       <div>   
+        <div class="output">
+          <span id="number">{{n}}</span>
+        </div>
+        <div class="actions">
+          <button id="add1">+1</button>
+          <button id="minus1">-1</button>
+          <button id="mul2">*2</button>
+          <button id="divide2">÷2</button>
+        </div>
+       </div>
+       `,
+  init(container) {
+    view.el = _jqueryDefault.default(container);
+    view.render(m.data.n);
+    // view=render(data)
+    view.autoBindEvents();
+    eventBus.on('m:update', () => {
+      view.render(m.data.n);
+    });
+  },
+  render(n) {
+    if (view.el.length !== 0) view.el.empty();
+    _jqueryDefault.default(view.html.replace('{{n}}', n)).appendTo(view.el);
+  },
+  // 表驱动编程
+  events: {
+    'click #add1': 'add',
+    'click #minus1': 'minus',
+    'click #mul2': 'mul',
+    'click #divide2': 'div'
+  },
+  add() {
+    m.update({
+      n: m.data.n + 1
+    });
+  },
+  minus() {
+    m.update({
+      n: m.data.n - 1
+    });
+  },
+  mul() {
+    m.update({
+      n: m.data.n * 2
+    });
+  },
+  div() {
+    m.update({
+      n: m.data.n / 2
+    });
+  },
+  autoBindEvents() {
+    for (let key in view.events) {
+      const value = view[view.events[key]];
+      const spaceIndex = key.indexOf(' ');
+      const part1 = key.slice(0, spaceIndex);
+      const part2 = key.slice(spaceIndex + 1);
+      view.el.on(part1, part2, value);
+    }
+  }
+};
+exports.default = view;
 
-},{"./app1.css":"11cDO","jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz"}],"11cDO":[function() {},{}],"6Oaih":[function(require,module,exports) {
+},{"./app1.css":"11cDO","jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz","./base/Model":"2d79G"}],"11cDO":[function() {},{}],"6Oaih":[function(require,module,exports) {
 var define;
 /*!
 * jQuery JavaScript Library v3.6.0
@@ -8286,30 +8345,128 @@ exports.export = function (dest, destName, get) {
     get: get
   });
 };
-},{}],"1bsR9":[function(require,module,exports) {
+},{}],"2d79G":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+class Model {
+  constructor(options) {
+    ['data', 'create', 'delete', 'update', 'get'].forEach(key => {
+      if ((key in options)) {
+        this[key] = options[key];
+      }
+    });
+  }
+  create() {
+    console?.error?.('你还没实现create');
+  }
+  delete() {
+    console?.error?.('你还没实现delete');
+  }
+  update() {
+    console?.error?.('你还没实现update');
+  }
+  get() {
+    console?.error?.('你还没实现get');
+  }
+}
+exports.default = Model;
+
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz"}],"1bsR9":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
 require('./app2.css');
 var _jquery = require('jquery');
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 var _jqueryDefault = _parcelHelpers.interopDefault(_jquery);
-const $tabBar = _jqueryDefault.default('#app2 .tab-bar');
-const $tabContent = _jqueryDefault.default('#app2 .tab-content');
-$tabBar.on('click', 'li', e => {
-  const $li = _jqueryDefault.default(e.currentTarget);
-  const index = $li.index();
-  $li.addClass('selected').siblings().removeClass('selected');
-  $tabContent.children().eq(index).// 等于第几个时
-  addClass('active').siblings().removeClass('active');
+var _baseModel = require("./base/Model");
+var _baseModelDefault = _parcelHelpers.interopDefault(_baseModel);
+const eventBus = _jqueryDefault.default(window);
+const localKey = 'app2.index';
+const m = new _baseModelDefault.default({
+  data: {
+    // 初始化数据
+    index: parseInt(localStorage.getItem(localKey)) || 0
+  },
+  update(data) {
+    Object.assign(m.data, data);
+    eventBus.trigger('m:update');
+    localStorage.setItem(localKey, m.data.index);
+  }
 });
-$tabBar.children().eq(0).trigger('click');
+const view = {
+  el: null,
+  html: index => {
+    return `
+       <div>
+        <ol class="tab-bar">
+          <li class="${index === 0 ? 'selected' : ''}" data-index='0' >1</li>
+          <li class="${index === 1 ? 'selected' : ''}" data-index='1'>2</li>
+        </ol>
+        <ol class="tab-content">
+          <li class="${index === 0 ? 'active' : ''}" >内容1</li>
+          <li class="${index === 1 ? 'active' : ''}" >内容2</li>
+        </ol>
+      </div>
+       `;
+  },
+  render(index) {
+    if (view.el.length !== 0) view.el.empty();
+    _jqueryDefault.default(view.html(index)).appendTo(view.el);
+  },
+  init(container) {
+    view.el = _jqueryDefault.default(container);
+    view.render(m.data.index);
+    // view=render(data)
+    view.autoBindEvents();
+    eventBus.on('m:update', () => {
+      view.render(m.data.index);
+    });
+  },
+  // 表驱动编程
+  events: {
+    'click .tab-bar li': 'x'
+  },
+  x(e) {
+    const index = parseInt(e.currentTarget.dataset.index);
+    m.update({
+      index: index
+    });
+  },
+  autoBindEvents() {
+    for (let key in view.events) {
+      const value = view[view.events[key]];
+      const spaceIndex = key.indexOf(' ');
+      const part1 = key.slice(0, spaceIndex);
+      const part2 = key.slice(spaceIndex + 1);
+      view.el.on(part1, part2, value);
+    }
+  }
+};
+exports.default = view;
 
-},{"./app2.css":"4biXF","jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz"}],"4biXF":[function() {},{}],"4knbM":[function(require,module,exports) {
+},{"./app2.css":"4biXF","jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz","./base/Model":"2d79G"}],"4biXF":[function() {},{}],"4knbM":[function(require,module,exports) {
 require('./app3.css');
 var _jquery = require('jquery');
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 var _jqueryDefault = _parcelHelpers.interopDefault(_jquery);
+const html = `
+      <section id="app3">
+        <div class="square"></div>
+      </section>
+`;
+_jqueryDefault.default(html).appendTo(_jqueryDefault.default('body>#page'));
 const $square = _jqueryDefault.default('#app3 .square');
+const active = localStorage.getItem('app3.active') === 'yes';
+$square.toggleClass('active', active);
+// $square.toggleClass('active')//默认有就删除active ，没有就加
 $square.on('click', () => {
-  $square.toggleClass('active');
+  // 如果有
+  if ($square.hasClass('active')) {
+    $square.removeClass('active');
+    localStorage.setItem('app3.active', 'no');
+  } else {
+    $square.addClass('active');
+    localStorage.setItem('app3.active', 'yes');
+  }
 });
 
 },{"./app3.css":"2MbNN","jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz"}],"2MbNN":[function() {},{}],"3XxMI":[function(require,module,exports) {
@@ -8317,6 +8474,12 @@ require('./app4.css');
 var _jquery = require('jquery');
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 var _jqueryDefault = _parcelHelpers.interopDefault(_jquery);
+const html = `
+      <section id="app4">
+        <div class="circle"></div>
+      </section>
+`;
+_jqueryDefault.default(html).appendTo(_jqueryDefault.default('body>#page'));
 const $circle = _jqueryDefault.default('#app4 .circle');
 $circle.on('mouseenter', () => {
   // 鼠标移进事件
