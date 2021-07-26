@@ -451,8 +451,8 @@ var _app2Js = require('./app2.js');
 var _app2JsDefault = _parcelHelpers.interopDefault(_app2Js);
 require('./app3.js');
 require('./app4.js');
-_app1JsDefault.default.init('#app1');
-_app2JsDefault.default.init('#app2');
+_app1JsDefault.default('#app1');
+_app2JsDefault.default('#app2');
 
 },{"./global.css":"2yhtl","./reset.css":"5dMMQ","./app1.js":"6OJP0","./app2.js":"1bsR9","./app3.js":"4knbM","./app4.js":"3XxMI","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz"}],"2yhtl":[function() {},{}],"5dMMQ":[function() {},{}],"6OJP0":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
@@ -460,92 +460,118 @@ _parcelHelpers.defineInteropFlag(exports);
 require('./app1.css');
 var _jquery = require('jquery');
 var _jqueryDefault = _parcelHelpers.interopDefault(_jquery);
-var _baseModel = require("./base/Model");
-var _baseModelDefault = _parcelHelpers.interopDefault(_baseModel);
-const eventBus = _jqueryDefault.default(window);
-// eventBus对象间的通信
+var _baseModelJs = require("./base/Model.js");
+var _baseModelJsDefault = _parcelHelpers.interopDefault(_baseModelJs);
+var _baseViewJs = require("./base/View.js");
+var _baseViewJsDefault = _parcelHelpers.interopDefault(_baseViewJs);
 // 数据相关的放到m
-const m = new _baseModelDefault.default({
+const m = new _baseModelJsDefault.default({
   data: {
-    n: parseInt(localStorage.getItem('n')) || 100
+    n: parseFloat(localStorage.getItem('n')) || 100
   },
   update(data) {
     Object.assign(m.data, data);
-    eventBus.trigger('m:update');
+    m.trigger('m:update');
     localStorage.setItem('n', m.data.n);
   }
 });
 // 初始化数据
 // 视图相关的反到v
-// 其他c
-const view = {
-  el: null,
-  html: `
-       <div>   
-        <div class="output">
-          <span id="number">{{n}}</span>
-        </div>
-        <div class="actions">
-          <button id="add1">+1</button>
-          <button id="minus1">-1</button>
-          <button id="mul2">*2</button>
-          <button id="divide2">÷2</button>
-        </div>
-       </div>
-       `,
-  init(container) {
-    view.el = _jqueryDefault.default(container);
-    view.render(m.data.n);
-    // view=render(data)
-    view.autoBindEvents();
-    eventBus.on('m:update', () => {
-      view.render(m.data.n);
-    });
-  },
-  render(n) {
-    if (view.el.length !== 0) view.el.empty();
-    _jqueryDefault.default(view.html.replace('{{n}}', n)).appendTo(view.el);
-  },
-  // 表驱动编程
-  events: {
-    'click #add1': 'add',
-    'click #minus1': 'minus',
-    'click #mul2': 'mul',
-    'click #divide2': 'div'
-  },
-  add() {
-    m.update({
-      n: m.data.n + 1
-    });
-  },
-  minus() {
-    m.update({
-      n: m.data.n - 1
-    });
-  },
-  mul() {
-    m.update({
-      n: m.data.n * 2
-    });
-  },
-  div() {
-    m.update({
-      n: m.data.n / 2
-    });
-  },
-  autoBindEvents() {
-    for (let key in view.events) {
-      const value = view[view.events[key]];
-      const spaceIndex = key.indexOf(' ');
-      const part1 = key.slice(0, spaceIndex);
-      const part2 = key.slice(spaceIndex + 1);
-      view.el.on(part1, part2, value);
+const init = el => {
+  new _baseViewJsDefault.default({
+    data: m.data,
+    el: el,
+    html: `
+                  <div>   
+                   <div class="output">
+                     <span id="number">{{n}}</span>
+                   </div>
+                   <div class="actions">
+                     <button id="add1">+1</button>
+                     <button id="minus1">-1</button>
+                     <button id="mul2">*2</button>
+                     <button id="divide2">÷2</button>
+                   </div>
+                  </div>`,
+    render(data) {
+      if (this.el.length !== 0) this.el.empty();
+      const n = data.n;
+      _jqueryDefault.default(this.html.replace('{{n}}', n)).appendTo(this.el);
+    },
+    // 表驱动编程
+    events: {
+      'click #add1': 'add',
+      'click #minus1': 'minus',
+      'click #mul2': 'mul',
+      'click #divide2': 'div'
+    },
+    add() {
+      m.update({
+        n: m.data.n + 1
+      });
+    },
+    minus() {
+      m.update({
+        n: m.data.n - 1
+      });
+    },
+    mul() {
+      m.update({
+        n: m.data.n * 2
+      });
+    },
+    div() {
+      m.update({
+        n: m.data.n / 2
+      });
     }
-  }
+  });
 };
-exports.default = view;
+exports.default = init;
 
-},{"./app1.css":"11cDO","jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz","./base/Model":"2d79G"}],"11cDO":[function() {},{}],"6Oaih":[function(require,module,exports) {
+},{"./app1.css":"11cDO","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz","jquery":"6Oaih","./base/Model.js":"2d79G","./base/View.js":"6p3hr"}],"11cDO":[function() {},{}],"7tSgz":[function(require,module,exports) {
+"use strict";
+
+exports.interopDefault = function (a) {
+  return a && a.__esModule ? a : {
+    default: a
+  };
+};
+
+exports.defineInteropFlag = function (a) {
+  Object.defineProperty(a, '__esModule', {
+    value: true
+  });
+};
+
+exports.exportAll = function (source, dest) {
+  Object.keys(source).forEach(function (key) {
+    if (key === 'default' || key === '__esModule') {
+      return;
+    } // Skip duplicate re-exports when they have the same value.
+
+
+    if (key in dest && dest[key] === source[key]) {
+      return;
+    }
+
+    Object.defineProperty(dest, key, {
+      enumerable: true,
+      get: function () {
+        return source[key];
+      }
+    });
+  });
+  return dest;
+};
+
+exports.export = function (dest, destName, get) {
+  Object.defineProperty(dest, destName, {
+    enumerable: true,
+    get: get
+  });
+};
+},{}],"6Oaih":[function(require,module,exports) {
 var define;
 /*!
 * jQuery JavaScript Library v3.6.0
@@ -8303,54 +8329,16 @@ var define;
   return jQuery;
 });
 
-},{}],"7tSgz":[function(require,module,exports) {
-"use strict";
-
-exports.interopDefault = function (a) {
-  return a && a.__esModule ? a : {
-    default: a
-  };
-};
-
-exports.defineInteropFlag = function (a) {
-  Object.defineProperty(a, '__esModule', {
-    value: true
-  });
-};
-
-exports.exportAll = function (source, dest) {
-  Object.keys(source).forEach(function (key) {
-    if (key === 'default' || key === '__esModule') {
-      return;
-    } // Skip duplicate re-exports when they have the same value.
-
-
-    if (key in dest && dest[key] === source[key]) {
-      return;
-    }
-
-    Object.defineProperty(dest, key, {
-      enumerable: true,
-      get: function () {
-        return source[key];
-      }
-    });
-  });
-  return dest;
-};
-
-exports.export = function (dest, destName, get) {
-  Object.defineProperty(dest, destName, {
-    enumerable: true,
-    get: get
-  });
-};
 },{}],"2d79G":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
-class Model {
+var _eventBusJs = require("./eventBus.js");
+var _eventBusJsDefault = _parcelHelpers.interopDefault(_eventBusJs);
+class Model extends _eventBusJsDefault.default {
   constructor(options) {
-    ['data', 'create', 'delete', 'update', 'get'].forEach(key => {
+    super();
+    const keys = ['data', 'create', 'delete', 'update', 'get'];
+    keys.forEach(key => {
       if ((key in options)) {
         this[key] = options[key];
       }
@@ -8371,79 +8359,118 @@ class Model {
 }
 exports.default = Model;
 
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz"}],"1bsR9":[function(require,module,exports) {
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz","./eventBus.js":"2hlv1"}],"2hlv1":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+var _jquery = require('jquery');
+var _jqueryDefault = _parcelHelpers.interopDefault(_jquery);
+// eventBus对象间的通信
+class EventBus {
+  constructor() {
+    this._eventBus = _jqueryDefault.default(window);
+  }
+  on(eventName, fn) {
+    return this._eventBus.on(eventName, fn);
+  }
+  trigger(eventName, data) {
+    return this._eventBus.trigger(eventName, data);
+  }
+  off(eventName, fn) {
+    return this._eventBus.off(eventName, fn);
+  }
+}
+exports.default = EventBus;
+
+},{"jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz"}],"6p3hr":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+var _jquery = require('jquery');
+var _jqueryDefault = _parcelHelpers.interopDefault(_jquery);
+var _eventBusJs = require("./eventBus.js");
+var _eventBusJsDefault = _parcelHelpers.interopDefault(_eventBusJs);
+class View extends _eventBusJsDefault.default {
+  constructor(options) {
+    super();
+    Object.assign(this, options);
+    this.el = _jqueryDefault.default(this.el);
+    this.render(this.data);
+    this.autoBindEvents();
+    this.on('m:update', () => {
+      this.render(this.data);
+    });
+  }
+  autoBindEvents() {
+    for (let key in this.events) {
+      const value = this[this.events[key]];
+      const spaceIndex = key.indexOf(' ');
+      const part1 = key.slice(0, spaceIndex);
+      const part2 = key.slice(spaceIndex + 1);
+      this.el.on(part1, part2, value);
+    }
+  }
+}
+exports.default = View;
+
+},{"jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz","./eventBus.js":"2hlv1"}],"1bsR9":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 require('./app2.css');
 var _jquery = require('jquery');
 var _jqueryDefault = _parcelHelpers.interopDefault(_jquery);
-var _baseModel = require("./base/Model");
-var _baseModelDefault = _parcelHelpers.interopDefault(_baseModel);
-const eventBus = _jqueryDefault.default(window);
+var _baseModelJs = require("./base/Model.js");
+var _baseModelJsDefault = _parcelHelpers.interopDefault(_baseModelJs);
+var _baseViewJs = require("./base/View.js");
+var _baseViewJsDefault = _parcelHelpers.interopDefault(_baseViewJs);
 const localKey = 'app2.index';
-const m = new _baseModelDefault.default({
+const m = new _baseModelJsDefault.default({
   data: {
     // 初始化数据
     index: parseInt(localStorage.getItem(localKey)) || 0
   },
   update(data) {
     Object.assign(m.data, data);
-    eventBus.trigger('m:update');
+    m.trigger('m:update');
     localStorage.setItem(localKey, m.data.index);
   }
 });
-const view = {
-  el: null,
-  html: index => {
-    return `
-       <div>
-        <ol class="tab-bar">
-          <li class="${index === 0 ? 'selected' : ''}" data-index='0' >1</li>
-          <li class="${index === 1 ? 'selected' : ''}" data-index='1'>2</li>
-        </ol>
-        <ol class="tab-content">
-          <li class="${index === 0 ? 'active' : ''}" >内容1</li>
-          <li class="${index === 1 ? 'active' : ''}" >内容2</li>
-        </ol>
-      </div>
+const init = el => {
+  new _baseViewJsDefault.default({
+    data: m.data,
+    el: el,
+    html(index) {
+      return `
+          <div>
+               <ol class="tab-bar">
+                   <li class="${index === 0 ? 'selected' : ''}" data-index='0' >1</li>
+                   <li class="${index === 1 ? 'selected' : ''}" data-index='1'>2</li>
+               </ol>
+               <ol class="tab-content">
+                   <li class="${index === 0 ? 'active' : ''}" >内容1</li>
+                   <li class="${index === 1 ? 'active' : ''}" >内容2</li>
+               </ol>
+         </div>
        `;
-  },
-  render(index) {
-    if (view.el.length !== 0) view.el.empty();
-    _jqueryDefault.default(view.html(index)).appendTo(view.el);
-  },
-  init(container) {
-    view.el = _jqueryDefault.default(container);
-    view.render(m.data.index);
-    // view=render(data)
-    view.autoBindEvents();
-    eventBus.on('m:update', () => {
-      view.render(m.data.index);
-    });
-  },
-  // 表驱动编程
-  events: {
-    'click .tab-bar li': 'x'
-  },
-  x(e) {
-    const index = parseInt(e.currentTarget.dataset.index);
-    m.update({
-      index: index
-    });
-  },
-  autoBindEvents() {
-    for (let key in view.events) {
-      const value = view[view.events[key]];
-      const spaceIndex = key.indexOf(' ');
-      const part1 = key.slice(0, spaceIndex);
-      const part2 = key.slice(spaceIndex + 1);
-      view.el.on(part1, part2, value);
+    },
+    render(data) {
+      const index = data.index;
+      if (this.el.length !== 0) this.el.empty();
+      _jqueryDefault.default(this.html(index)).appendTo(this.el);
+    },
+    // 表驱动编程
+    events: {
+      'click .tab-bar li': 'x'
+    },
+    x(e) {
+      const index = parseInt(e.currentTarget.dataset.index);
+      m.update({
+        index: index
+      });
     }
-  }
+  });
 };
-exports.default = view;
+exports.default = init;
 
-},{"./app2.css":"4biXF","jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz","./base/Model":"2d79G"}],"4biXF":[function() {},{}],"4knbM":[function(require,module,exports) {
+},{"./app2.css":"4biXF","jquery":"6Oaih","@parcel/transformer-js/lib/esmodule-helpers.js":"7tSgz","./base/Model.js":"2d79G","./base/View.js":"6p3hr"}],"4biXF":[function() {},{}],"4knbM":[function(require,module,exports) {
 require('./app3.css');
 var _jquery = require('jquery');
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
